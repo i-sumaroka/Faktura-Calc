@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faktura Calc 2026 | Polish JDG</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-decor"></div>
+
+    <main class="container">
+        <header>
+            <div>
+                <div class="logo">Faktura<span>Calc</span></div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 300;">Калькулятор JDG Польща 2026
+                    (ZUS + VAT + Zdrowotna)</p>
+            </div>
+            <div class="rate-info" id="rateDisplay">Курс: завантаження...</div>
+        </header>
+
+        <section class="calculator-card">
+            <div class="input-section">
+                <div class="toggle-group">
+                    <button id="modeForward" class="active">Ввести Нетто (Invoice)</button>
+                    <button id="modeBackward">Ввести "На руки" (Target)</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="amount" id="amountLabel">Сума Faktura Netto</label>
+                    <div class="input-row">
+                        <input type="number" id="amount" placeholder="0.00" step="100">
+                        <select id="currency">
+                            <option value="PLN">PLN</option>
+                            <option value="EUR">EUR</option>
+                            <option value="USD">USD</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="input-group">
+                        <label>Форма оподаткування <a class="info-link" id="openFaq">Що обрати?</a></label>
+                        <select id="taxForm">
+                            <option value="skala">Skala Podatkowa (12%/32%)</option>
+                            <option value="liniowy">Podatek Liniowy (19%)</option>
+                            <option value="ryczalt_2">Ryczałt (2%) — Сільське госп.</option>
+                            <option value="ryczalt_3">Ryczałt (3%) — Торгівля / Гастро</option>
+                            <option value="ryczalt_55">Ryczałt (5.5%) — Виробництво</option>
+                            <option value="ryczalt_85" selected>Ryczałt (8.5%) — Послуги / IT non-SW</option>
+                            <option value="ryczalt_12">Ryczałt (12%) — IT (Software)</option>
+                            <option value="ryczalt_14">Ryczałt (14%) — Медицина / Архітектура</option>
+                            <option value="ryczalt_15">Ryczałt (15%) — Консалтинг / Реклама</option>
+                            <option value="ryczalt_17">Ryczałt (17%) — Вільні професії</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="zusType">Тип ZUS</label>
+                        <select id="zusType">
+                            <option value="big">Pełny (Duży)</option>
+                            <option value="preferential">Preferencyjny</option>
+                            <option value="relief">Ulga на start</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group" id="autoHealthGroup">
+                    <label for="healthTier">Składka Zdrowotna (Tier)</label>
+                    <select id="healthTier">
+                        <option value="auto">Авто (за доходом)</option>
+                        <option value="tier1">Tier 1: До 60k річних (498 zł)</option>
+                        <option value="tier2" selected>Tier 2: 60k - 300k річних (830 zł)</option>
+                        <option value="tier3">Tier 3: Понад 300k річних (1495 zł)</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="includesSickness" checked>
+                        <span>Dobrowolne Chorobowe</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="main-result">
+                    <span class="label">Залишиться на руки:</span>
+                    <span class="value" id="resTakeHome">0.00 zł</span>
+                </div>
+
+                <div class="breakdown">
+                    <div class="breakdown-item">
+                        <span>Invoice Netto (PLN):</span>
+                        <span id="resNetto">0.00 zł</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>VAT (23%):</span>
+                        <span id="resVat">0.00 zł</span>
+                    </div>
+                    <div class="breakdown-item" style="font-weight: 600; color: var(--text-main);">
+                        <span>Suma Faktury (Gross):</span>
+                        <span id="resGross">0.00 zł</span>
+                    </div>
+                    <div class="breakdown-divider"></div>
+                    <div class="breakdown-item">
+                        <span>ZUS Społeczny:</span>
+                        <span id="resSocial">0.00 zł</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>ZUS Zdrowotna:</span>
+                        <span id="resHealth">0.00 zł</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Podatek PIT:</span>
+                        <span id="resPit">0.00 zł</span>
+                    </div>
+                    <div class="breakdown-divider"></div>
+                    <div class="breakdown-item total-tax">
+                        <span>Всього податків:</span>
+                        <span id="resTotalTax">0.00 zł</span>
+                    </div>
+                    <div class="breakdown-item"
+                        style="margin-top: 8px; border-top: 1px dashed var(--border-color); padding-top: 8px;">
+                        <span>Прогноз Нетто (Рік):</span>
+                        <span id="resAnnual" style="color: var(--primary); font-weight: 700;">0.00 zł</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Ставки 2026. Health Tiers: 498 / 830 / 1495 PLN. (v1.6 FINAL)</p>
+        </footer>
+    </main>
+
+    <!-- DRAWER OVERLAY -->
+    <div id="faqOverlay"></div>
+    <!-- DRAWER CONTENT -->
+    <div id="faqDrawer">
+        <div class="drawer-header">
+            <h3>Довідник Ryczałt & PKD</h3>
+            <button id="closeFaq">&times;</button>
+        </div>
+
+        <div class="faq-sec">
+            <h3>Популярні ставки</h3>
+            <div class="faq-card">
+                <b>12% — IT (Oprogramowanie)</b>
+                <p>Програмування, видання ПЗ, консультування у сфері IT, управління IT-системами.</p>
+            </div>
+            <div class="faq-card">
+                <b>8.5% — Послуги (IT support)</b>
+                <p>Тестування ПЗ (QA), аналітика, адміністрування мереж, копірайтинг, дизайн (не ПЗ).</p>
+            </div>
+            <div class="faq-card">
+                <b>15% — Бізнес-консалтинг</b>
+                <p>Фінансове посередництво, управління бізнесом, рекрутинг, HR-послуги.</p>
+            </div>
+            <div class="faq-card">
+                <b>14% — Спеціалісти</b>
+                <p>Охорона здоров'я, архітектура, інженерне проектування, спеціалізоване навчання.</p>
+            </div>
+        </div>
+
+        <div class="faq-sec">
+            <h3>Здоров'я (Składka Zdrowotna) 2026</h3>
+            <div class="faq-card">
+                <b>Ryczałt (Tier-система)</b>
+                <p>База розраховується від середньої зарплати. Прогноз на 2026:<br>• I поріг: 498.35 zł<br>• II поріг:
+                    830.58 zł<br>• III поріг: 1495.04 zł</p>
+            </div>
+            <div class="faq-card">
+                <b>Skala (9%) / Liniowy (4.9%)</b>
+                <p>Розраховується від чистого доходу. Мінімальна сума у 2026 році складає ~432.54 zł.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const RULES = {
+            ZUS_BASIS: 5652.00,
+            PREF_BASIS: 1442.10,
+            SOCIAL: { pension: 0.1952, disability: 0.08, sickness: 0.0245, accident: 0.0167, labor: 0.0245 },
+            HEALTH_MIN: 432.54,
+            SKALA: { thr: 120000, rL: 0.12, rH: 0.32, free: 30000, hR: 0.09 },
+            LINIOWY: { r: 0.19, hR: 0.049 },
+            RYCZALT_HEALTH: [
+                { lim: 60000, val: 498.35 },
+                { lim: 300000, val: 830.58 },
+                { lim: Infinity, val: 1495.04 }
+            ]
+        };
+
+        const rates = { EUR: 4.45, USD: 4.20 };
+
+        async function fetchRates() {
+            try {
+                const res = await fetch('https://api.nbp.pl/api/exchangerates/tables/a/?format=json');
+                const data = await res.json();
+                rates.EUR = data[0].rates.find(r => r.code === 'EUR').mid;
+                rates.USD = data[0].rates.find(r => r.code === 'USD').mid;
+                document.getElementById('rateDisplay').textContent = `Курс: €${rates.EUR.toFixed(2)} | $${rates.USD.toFixed(2)}`;
+                update();
+            } catch (err) {
+                console.error("NBP API error", err);
+                document.getElementById('rateDisplay').textContent = `Курс: Offline (€${rates.EUR.toFixed(2)})`;
+            }
+        }
+
+        function calculate(netPLN, opts) {
+            let res = { net: netPLN, sZ: 0, hZ: 0, pit: 0, vat: netPLN * 0.23, gr: netPLN * 1.23 };
+
+            // Social
+            let basis = opts.zus === 'big' ? RULES.ZUS_BASIS : (opts.zus === 'preferential' ? RULES.PREF_BASIS : 0);
+            if (basis > 0) {
+                res.sZ = basis * (RULES.SOCIAL.pension + RULES.SOCIAL.disability + RULES.SOCIAL.accident + (opts.sick ? RULES.SOCIAL.sickness : 0) + (opts.zus === 'big' ? RULES.SOCIAL.labor : 0));
+            }
+
+            const income = Math.max(0, netPLN - res.sZ);
+
+            if (opts.form === 'skala') {
+                res.hZ = Math.max(RULES.HEALTH_MIN, income * RULES.SKALA.hR);
+                if (income > RULES.SKALA.free) {
+                    const taxable = income - RULES.SKALA.free;
+                    res.pit = income <= RULES.SKALA.thr ? taxable * RULES.SKALA.rL : (RULES.SKALA.thr - RULES.SKALA.free) * RULES.SKALA.rL + (income - RULES.SKALA.thr) * RULES.SKALA.rH;
+                }
+            } else if (opts.form === 'liniowy') {
+                res.hZ = Math.max(RULES.HEALTH_MIN, income * RULES.LINIOWY.hR);
+                res.pit = income * RULES.LINIOWY.r;
+            } else if (opts.form.startsWith('ryczalt')) {
+                const rRate = opts.form === 'ryczalt_55' ? 0.055 : (opts.form === 'ryczalt_85' ? 0.085 : parseInt(opts.form.split('_')[1]) / 100);
+                if (opts.hT === 'auto') {
+                    const hTable = RULES.RYCZALT_HEALTH.find(t => (netPLN * 12) <= t.lim);
+                    res.hZ = hTable.val;
+                } else {
+                    res.hZ = opts.hT === 'tier1' ? 498.35 : (opts.hT === 'tier2' ? 830.58 : 1495.04);
+                }
+                res.pit = Math.max(0, netPLN - res.sZ * 0.5) * rRate;
+            }
+
+            res.tT = res.sZ + res.hZ + res.pit;
+            res.take = netPLN - res.tT;
+            return res;
+        }
+
+        const dom = {
+            amt: document.getElementById('amount'), cur: document.getElementById('currency'),
+            tf: document.getElementById('taxForm'), zus: document.getElementById('zusType'),
+            hT: document.getElementById('healthTier'), hG: document.getElementById('autoHealthGroup'),
+            sick: document.getElementById('includesSickness'),
+            mF: document.getElementById('modeForward'), mB: document.getElementById('modeBackward'),
+            rTH: document.getElementById('resTakeHome'), rN: document.getElementById('resNetto'),
+            rV: document.getElementById('resVat'), rG: document.getElementById('resGross'),
+            rS: document.getElementById('resSocial'), rH: document.getElementById('resHealth'),
+            rP: document.getElementById('resPit'), rTT: document.getElementById('resTotalTax'),
+            rAn: document.getElementById('resAnnual'),
+            lbl: document.getElementById('amountLabel'),
+            open: document.getElementById('openFaq'), close: document.getElementById('closeFaq'),
+            drw: document.getElementById('faqDrawer'), ovl: document.getElementById('faqOverlay')
+        };
+
+        let mode = 'forward';
+
+        function update() {
+            const raw = parseFloat(dom.amt.value) || 0;
+            const plnValue = dom.cur.value === 'PLN' ? raw : raw * rates[dom.cur.value];
+            const isRyc = dom.tf.value.startsWith('ryczalt');
+            dom.hG.style.display = isRyc ? 'block' : 'none';
+
+            const opts = { form: dom.tf.value, zus: dom.zus.value, hT: dom.hT.value, sick: dom.sick.checked };
+
+            let res;
+            if (mode === 'forward') {
+                res = calculate(plnValue, opts);
+            } else {
+                let L = plnValue, H = plnValue * 5, B = L;
+                for (let i = 0; i < 60; i++) {
+                    let M = (L + H) / 2;
+                    if (calculate(M, opts).take < plnValue) L = M;
+                    else { H = M; B = M; }
+                }
+                res = calculate(B, opts);
+            }
+
+            const f = (v) => v.toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + ' zł';
+            dom.rTH.textContent = f(res.take);
+            dom.rN.textContent = f(res.net);
+            dom.rV.textContent = f(res.vat);
+            dom.rG.textContent = f(res.gr);
+            dom.rS.textContent = f(res.sZ);
+            dom.rH.textContent = f(res.hZ);
+            dom.rP.textContent = f(res.pit);
+            dom.rTT.textContent = f(res.tT);
+            dom.rAn.textContent = f(res.net * 12);
+        }
+
+        [dom.amt, dom.cur, dom.tf, dom.zus, dom.hT, dom.sick].forEach(e => e.addEventListener('input', update));
+
+        dom.mF.onclick = () => { mode = 'forward'; dom.mF.classList.add('active'); dom.mB.classList.remove('active'); dom.lbl.textContent = 'Сума Faktura Netto'; update(); };
+        dom.mB.onclick = () => { mode = 'backward'; dom.mB.classList.add('active'); dom.mF.classList.remove('active'); dom.lbl.textContent = 'Бажана сума "На руки"'; update(); };
+
+        dom.open.onclick = () => { dom.drw.classList.add('active'); dom.ovl.style.display = 'block'; };
+        dom.close.onclick = dom.ovl.onclick = () => { dom.drw.classList.remove('active'); dom.ovl.style.display = 'none'; };
+
+        fetchRates();
+        update();
+    </script>
+</body>
+
+</html>
