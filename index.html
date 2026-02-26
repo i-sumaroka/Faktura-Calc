@@ -135,7 +135,7 @@
         </section>
 
         <footer>
-            <p>Ставки 2026. Health Tiers: 498 / 830 / 1495 PLN. (v1.6 FINAL)</p>
+            <p>Ставки 2026. Health Tiers: 498 / 830 / 1495 PLN. (v1.7 FINAL)</p>
         </footer>
     </main>
 
@@ -288,7 +288,7 @@
                 res = calculate(B, opts);
             }
 
-            const f = (v) => v.toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + ' zł';
+            const f = (v) => v.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' zł';
             dom.rTH.textContent = f(res.take);
             dom.rN.textContent = f(res.net);
             dom.rV.textContent = f(res.vat);
